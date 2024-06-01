@@ -1,4 +1,5 @@
 import 'package:amaliyot/utils/app_constant.dart';
+import 'package:amaliyot/utils/preferences.dart';
 import 'package:amaliyot/view/screens/pin_code_page.dart';
 import 'package:flutter/material.dart';
 
@@ -14,34 +15,51 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  void toggleThemeMode(bool value) {
+  @override
+  void initState() {
+    super.initState();
+    _initializePreferences();
+  }
+
+  Future<void> _initializePreferences() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    AppConstants.themeMode =
+        await Preferences.getTheme() ? ThemeMode.dark : ThemeMode.light;
+    AppConstants.appBarColor = await Preferences.getAppBarColor();
+    AppConstants.fontSize = await Preferences.getFontSize();
+    AppConstants.textColor = await Preferences.getTextColor();
+    AppConstants.images = await Preferences.getImages();
+    setState(() {});
+  }
+
+  void toggleThemeMode(bool value) async {
+    await Preferences.setTheme(value);
     AppConstants.themeMode = value ? ThemeMode.dark : ThemeMode.light;
     setState(() {});
   }
 
-  void backgroundImage(String imageUrl) {
-    setState(
-      () {
-        if (imageUrl.trim().isNotEmpty) {
-          AppConstants.images = imageUrl;
-          setState(() {});
-        }
-      },
-    );
+  void backgroundImage(String imageUrl) async {
+    if (imageUrl.trim().isNotEmpty) {
+      await Preferences.setImages(imageUrl);
+      AppConstants.images = imageUrl;
+      setState(() {});
+    }
   }
 
-  void appBarColor(Color appBarStayle) {
-    AppConstants.appBarColor = appBarStayle;
+  void appBarColor(Color appBarStyle) async {
+    await Preferences.setAppBarColor(appBarStyle);
+    AppConstants.appBarColor = appBarStyle;
     setState(() {});
   }
 
-  void fontSize(double textFontSize) {
-    print(textFontSize);
+  void fontSize(double textFontSize) async {
+    await Preferences.setFontSize(textFontSize);
     AppConstants.fontSize = textFontSize;
     setState(() {});
   }
 
-  void textColor(Color textFontColor) {
+  void textColor(Color textFontColor) async {
+    await Preferences.setTextColor(textFontColor);
     AppConstants.textColor = textFontColor;
     setState(() {});
   }
@@ -51,8 +69,14 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.amber,
+        appBarTheme: AppBarTheme(
+          backgroundColor: AppConstants.appBarColor,
+        ),
+        textTheme: TextTheme(
+          bodyMedium: TextStyle(
+            fontSize: AppConstants.fontSize,
+            color: AppConstants.textColor,
+          ),
         ),
       ),
       darkTheme: ThemeData.dark(),

@@ -1,4 +1,5 @@
 import 'package:amaliyot/utils/app_constant.dart';
+import 'package:amaliyot/utils/preferences.dart';
 import 'package:amaliyot/view/screens/home_screen.dart';
 import 'package:amaliyot/view/screens/settings_page.dart';
 import 'package:flutter/material.dart';
@@ -27,16 +28,34 @@ class CustomDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: AppConstants.appBarColor,
             ),
-            child: const Column(
+            child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text("MENYU"),
+                Text(
+                  "MENYU",
+                  style: TextStyle(
+                    fontSize: AppConstants.fontSize,
+                    color: AppConstants.textColor,
+                  ),
+                ),
               ],
             ),
           ),
           ListTile(
-            onTap: () {
+            onTap: () async {
+              // Fetch saved preferences
+              bool isDarkTheme = await Preferences.getTheme();
+              Color appBarColor = await Preferences.getAppBarColor();
+              double fontSize = await Preferences.getFontSize();
+              Color textColor = await Preferences.getTextColor();
+
+              // Apply the preferences using the provided callbacks
+              onThemeChanged(isDarkTheme);
+              onAppBarColorChanged(appBarColor);
+              onTextFontSize(fontSize);
+              onTextColor(textColor);
+
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -51,7 +70,13 @@ class CustomDrawer extends StatelessWidget {
                 ),
               );
             },
-            title: const Text("Bosh sahifa"),
+            title: Text(
+              "Bosh sahifa",
+              style: TextStyle(
+                fontSize: AppConstants.fontSize,
+                color: AppConstants.textColor,
+              ),
+            ),
             trailing: const Icon(
               Icons.keyboard_arrow_right,
             ),

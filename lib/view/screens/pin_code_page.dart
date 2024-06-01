@@ -1,4 +1,5 @@
 import 'package:amaliyot/utils/app_constant.dart';
+import 'package:amaliyot/utils/preferences.dart';
 import 'package:amaliyot/view/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:zoom_tap_animation/zoom_tap_animation.dart';
@@ -27,6 +28,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
 
   String errorMessagePinCode1 = "";
   String errorMessagePinCode2 = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,12 +76,12 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
             ),
             const SizedBox(height: 50),
             ZoomTapAnimation(
-              onTap: () {
+              onTap: () async {
                 if (textPinCodeController1.text.length < 4) {
-                  errorMessagePinCode1 = "Don't be less four number";
+                  errorMessagePinCode1 = "Don't be less than four numbers";
                 } else if (textPinCodeController1.text !=
                     textPinCodeController2.text) {
-                  errorMessagePinCode2 = "Pin Code will be same";
+                  errorMessagePinCode2 = "Pin Codes must be the same";
                 } else {
                   errorMessagePinCode2 = "";
                   errorMessagePinCode1 = "";
@@ -88,6 +90,7 @@ class _PinCodeScreenState extends State<PinCodeScreen> {
                 if (errorMessagePinCode1.isEmpty &&
                     errorMessagePinCode2.isEmpty) {
                   AppConstants.password = textPinCodeController1.text;
+                  await Preferences.setPassword(AppConstants.password);
                   Navigator.pushReplacement(context, MaterialPageRoute(
                     builder: (context) {
                       return HomeScreen(
